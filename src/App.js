@@ -1,55 +1,43 @@
 import React, {useState} from 'react';
+import axios from "axios";
 
 const App = () => {
-  //함수, 상수, 상태 등을 선언하는곳 return은 화면에 보여주는곳
-    const [keyword, setKeyword] = useState("")
+    const [movies, setMovies] = useState([]) //array형태 데이터 가지고옴
 
-    // 키워드를 변경하는 함수
-    const changeKeyword = () => {
-        console.log("키워드임")
-        setKeyword("키워드")
+    //axios 데이터를 가지고오는 네트워크 라이브러리
+
+    //movie 데이터를 가져오는 함수
+    //인터넷을 가져올때 async 해줌
+    const getMovies = async () => {
+        try{
+            const options = {
+                method: 'GET',
+                headers: {
+                    accept: 'application/json',
+                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmNzM1NDc3MjQ0M2FlODIyNTUxNDQ4MjMwMzZmNDhlOCIsInN1YiI6IjY0NjlhODE1MDA2YjAxMDE4OTU4ZDlhMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.RJDHcyvrIfSlqIBCcK95nTmRqfDhBtjpbp7IcepDTFY'
+                }
+            };
+            const result = await axios.get("https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1", options)
+            setMovies(result.data.results)
+            console.log(result.data.results)
+        } catch (err){
+            console.log(err)
+        }
     }
-    const moiveData = {
-            "adult": false,
-            "backdrop_path": "/fI5RsaM0NSU6TqztRhA2pal5ezv.jpg",
-            "genre_ids": [
-                28,
-                80,
-                53
-            ],
-            "id": 385687,
-            "original_language": "en",
-            "original_title": "Fast X",
-            "overview": "Over many missions and against impossible odds, Dom Toretto and his family have outsmarted, out-nerved and outdriven every foe in their path. Now, they confront the most lethal opponent they've ever faced: A terrifying threat emerging from the shadows of the past who's fueled by blood revenge, and who is determined to shatter this family and destroy everything—and everyone—that Dom loves, forever.",
-            "popularity": 5227.39,
-            "poster_path": "/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
-            "release_date": "2023-05-17",
-            "title": "Fast X",
-            "video": false,
-            "vote_average": 7.1,
-            "vote_count": 190
-    }
+    //자동으로 실행하는 함수(hook)
+    useState(() => {
+        getMovies()
+    }, [])
 
     return (
         <div>
-            <h1>
-                {moiveData.id}
-            </h1>
-            <h1>
-                title: {moiveData.title}
-            </h1>
-            <h2>
-                설명 : {moiveData.overview}
-            </h2>
-            <h1>
-                비디오 : {moiveData.video ? "비디오있음" : "비디오없음"}
-            </h1>
-            <h2>
-                vote_count: {moiveData.vote_count}
-            </h2>
-            <h1>
-                {moiveData.popularity}
-            </h1>
+            {movies && movies.map(movie => (
+                <div>
+                    <h1>{movie.title}</h1>
+                    <h3>release_date : {movie.release_date}</h3>
+                    <h4>overview: {movie.overview}</h4>
+                </div>
+            ))}
         </div>
     );
 };
