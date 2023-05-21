@@ -1,44 +1,55 @@
 import React, {useState} from 'react';
 import axios from "axios";
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import {Grid, Container} from "@mui/material";
 
 const App = () => {
-    const [movies, setMovies] = useState([]) //array형태 데이터 가지고옴
+    const [news, setNews] = useState([])
 
-    //axios 데이터를 가지고오는 네트워크 라이브러리
-
-    //movie 데이터를 가져오는 함수
-    //인터넷을 가져올때 async 해줌
-    const getMovies = async () => {
+    const getNews =async () =>{
         try{
-            const options = {
-                method: 'GET',
-                headers: {
-                    accept: 'application/json',
-                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmNzM1NDc3MjQ0M2FlODIyNTUxNDQ4MjMwMzZmNDhlOCIsInN1YiI6IjY0NjlhODE1MDA2YjAxMDE4OTU4ZDlhMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.RJDHcyvrIfSlqIBCcK95nTmRqfDhBtjpbp7IcepDTFY'
-                }
-            };
-            const result = await axios.get("https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1", options)
-            setMovies(result.data.results)
-            console.log(result.data.results)
+            const result = await axios.get("https://newsapi.org/v2/everything?q=tesla&from=2023-04-21&sortBy=publishedAt&apiKey=f1c87e2bb86248de9f9492e513f93e1f")
+            console.log(result.data.articles)
+            setNews(result.data.articles)
         } catch (err){
             console.log(err)
         }
     }
-    //자동으로 실행하는 함수(hook)
+    //자동실행 함수
     useState(() => {
-        getMovies()
+        getNews()
     }, [])
 
+
     return (
-        <div>
-            {movies && movies.map(movie => (
-                <div>
-                    <h1>{movie.title}</h1>
-                    <h3>release_date : {movie.release_date}</h3>
-                    <h4>overview: {movie.overview}</h4>
-                </div>
-            ))}
-        </div>
+        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} >
+           {news && news.map(n => (
+               <Card sx={{ maxWidth: 345 }}>
+                   <CardMedia
+                       sx={{ height: 120 }}
+                       image={n.urlToImage}
+                       title="green iguana"
+                   />
+                   <CardContent>
+                       <Typography gutterBottom variant="h5" component="div">
+                           {n.title.slice(0,13)}
+                       </Typography>
+                       <Typography variant="body2" color="text.secondary">
+                           {n.description.slice(0,150)}
+                       </Typography>
+                   </CardContent>
+                   <CardActions>
+                       <Button size="small">Share</Button>
+                       <Button size="small">자세히 보기</Button>
+                   </CardActions>
+               </Card>
+           ))}
+        </Grid>
     );
 };
 
